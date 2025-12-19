@@ -1,7 +1,8 @@
 # AgenticCloudServiceValidator
 Cloud services are today built driving goal states and could have multiple dependencies between services to maintain states.
 The aim of this project to is build an AI application that spins up Agents to perform validations against your dependencies.
-Features:
+
+# Features:
 1. The app should be lightweight and deployed on managed Kubernetes
 2. The user should be able to define which service is being validated and what are the dependent services.
 3. Users need to provide the authentication and authorization required by the Agent to access the goal state for the dependent services
@@ -13,3 +14,4 @@ Features:
     4) Alert users when anamolies are beyond thresholds
 6. The application will also have a UI Dashboard to visualize the report using Grafana.
 
+# Repo Language: Python
