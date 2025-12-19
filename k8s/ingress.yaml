@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: validator-ingress
+  namespace: validator
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - validator.example.com
+    secretName: validator-tls
+  rules:
+  - host: validator.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: validator-service
+            port:
+              number: 80
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: validator
+  labels:
+    name: validator

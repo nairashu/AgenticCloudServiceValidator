@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'cloud-validator'
+    environment: 'production'
+
+scrape_configs:
+  # Validator Application Metrics
+  - job_name: 'validator-app'
+    static_configs:
+      - targets: ['validator:9090']
+        labels:
+          app: 'cloud-service-validator'
+          component: 'api'
+
+  # PostgreSQL Exporter (optional)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+        labels:
+          app: 'cloud-service-validator'
+          component: 'database'
+
+  # Self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

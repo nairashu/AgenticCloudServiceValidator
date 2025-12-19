@@ -1,0 +1,87 @@
+# Example Service Configuration
+# This file shows how to configure the validator for an e-commerce platform
+
+{
+  "config_name": "E-Commerce Platform Validation",
+  "primary_service": {
+    "service_id": "order-service",
+    "service_name": "Order Management Service",
+    "service_type": "REST_API",
+    "endpoint": "https://api.orders.example.com",
+    "auth_config": {
+      "auth_type": "bearer_token",
+      "credentials": {
+        "token": "your_bearer_token_here"
+      }
+    },
+    "health_check_path": "/health",
+    "timeout_seconds": 30
+  },
+  "dependent_services": [
+    {
+      "service_id": "payment-service",
+      "service_name": "Payment Processing Service",
+      "service_type": "REST_API",
+      "endpoint": "https://api.payments.example.com",
+      "auth_config": {
+        "auth_type": "api_key",
+        "credentials": {
+          "api_key": "your_api_key_here"
+        },
+        "headers": {
+          "X-API-Key": "{api_key}"
+        }
+      },
+      "health_check_path": "/v1/health",
+      "timeout_seconds": 30
+    },
+    {
+      "service_id": "inventory-service",
+      "service_name": "Inventory Management Service",
+      "service_type": "REST_API",
+      "endpoint": "https://api.inventory.example.com",
+      "auth_config": {
+        "auth_type": "oauth2",
+        "credentials": {
+          "client_id": "your_client_id",
+          "client_secret": "your_client_secret"
+        },
+        "token_endpoint": "https://auth.example.com/oauth/token"
+      },
+      "health_check_path": "/health",
+      "timeout_seconds": 30
+    }
+  ],
+  "validation_rules": [
+    {
+      "rule_id": "order-payment-consistency",
+      "rule_name": "Order-Payment Consistency Check",
+      "description": "Verify that all completed orders have corresponding successful payments",
+      "source_service": "order-service",
+      "target_service": "payment-service",
+      "expected_fields": ["order_id", "payment_id", "amount", "status"],
+      "comparison_logic": "For each order with status='completed', verify payment exists with matching order_id and status='success'"
+    },
+    {
+      "rule_id": "order-inventory-sync",
+      "rule_name": "Order-Inventory Synchronization",
+      "description": "Ensure inventory is correctly decremented for fulfilled orders",
+      "source_service": "order-service",
+      "target_service": "inventory-service",
+      "expected_fields": ["product_id", "quantity", "updated_at"],
+      "comparison_logic": "For each fulfilled order, verify inventory quantity decreased by order quantity"
+    },
+    {
+      "rule_id": "payment-amount-validation",
+      "rule_name": "Payment Amount Validation",
+      "description": "Verify payment amounts match order totals",
+      "source_service": "payment-service",
+      "target_service": "order-service",
+      "expected_fields": ["amount", "currency", "order_id"],
+      "comparison_logic": "payment.amount == order.total_amount AND payment.currency == order.currency"
+    }
+  ],
+  "validation_interval_minutes": 60,
+  "schedule_cron": "0 */4 * * *",
+  "enabled": true
+}
